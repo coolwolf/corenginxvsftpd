@@ -202,7 +202,7 @@ def CreateKestrel():
         'Description='+DomainName+' .netCore App\n'\
         '[Service]\n'\
         'WorkingDirectory='+WebFolder+DmnUserName+'/html\n'\
-        'ExecStart='+DotNetBin+' '+WebFolder+DmnUserName+'/'+DllName+'\n'\
+        'ExecStart='+DotNetBin+' '+WebFolder+DmnUserName+'/html/'+DllName+'\n'\
         'Restart=always\n'\
         'RestartSec=10\n'\
         'KillSignal=SIGINT\n'\
