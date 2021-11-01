@@ -36,4 +36,4 @@ Now a Kestrel service will be add to /etc/systemd/system and then will be enable
 After appending user named [DomainName] to **/etc/vsftpd.user_list**, Script will as to create LetsEncrypt certificate.
 If you answer [y] certificate for [DomainName] will be created and applied to nginx host file.
 
-**Note: i am not good in python. this script is created just for ease and not forgot steps to run a .net core app.**
+**Note: i am not good in python. this script is created just for ease and not forgot steps to run a .net core app. You are welcome to help imrpoving this script**
