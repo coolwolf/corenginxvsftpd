@@ -18,6 +18,7 @@ NginxLogFolder='/var/log/nginx/'
 DotNetBin='/usr/bin/dotnet'
 VsFtpUserListFolder='/etc/vsftpd.user_list'
 DomainName = ''
+DmnUserName=''
 UserPassword=''
 CoreUrl=''
 DllName=''
@@ -83,29 +84,18 @@ def WwwIncluded():
     if answer=='y':
         IncludeWWW=True
 
-def CreateFolders():
-    print("\nCreate folder:"+WebFolder+DomainName)
-    os.mkdir(WebFolder+DomainName,0o755)
-    print("\nCreate folder:"+WebFolder+DomainName+"/html")
-    os.mkdir(WebFolder+DomainName+"/html",0o755)
-    print("\nCreate folder:"+WebFolder+DomainName+"/logs")
-    os.mkdir(WebFolder+DomainName+"/logs",0o755)
-    print("\nCreate folder:"+WebFolder+DomainName+"/data")
-    os.mkdir(WebFolder+DomainName+"/data",0o755)
-
-def CreateUser():
-    print("\nRun command: useradd -p "+UserPassword+" "+DomainName+" -d "+WebFolder+DomainName)
-    os.system("useradd -p "+UserPassword+" "+DomainName+" -d "+WebFolder+DomainName)
-    print("\nRun command: chown -R "+DomainName+":"+DomainName+ " "+WebFolder+DomainName)
-    os.system("chown -R "+DomainName+":"+DomainName+ " "+WebFolder+DomainName)
-    print("\nRun command: chmod -R 755 "+WebFolder+DomainName)
-    os.system("chmod -R 755 "+WebFolder+DomainName)
+def AskUserName():
+    global DmnUserName
+    DmnUserName=DomainName[1:DomainName.index(".")]
+    answer = input("User Name for domain ? ["+DmnUserName+"]:")
+    if answer!="":
+        DmnUserName=answer
 
 def AskPassword():
     isValid=False
     global UserPassword
     while not isValid:
-        UserPassword = input("Enter password for user "+DomainName+" :")
+        UserPassword = input("Enter password for user "+DmnUserName+" :")
         if len(UserPassword)<8:
             print("\nMin. 8 characters required.")
         else:
@@ -142,6 +132,24 @@ def AskDllName():
         else:
             isValid=True
 
+def CreateFolders():
+    print("\nCreate folder:"+WebFolder+DmnUserName)
+    os.mkdir(WebFolder+DmnUserName,0o755)
+    print("\nCreate folder:"+WebFolder+DmnUserName+"/html")
+    os.mkdir(WebFolder+DmnUserName+"/html",0o755)
+    print("\nCreate folder:"+WebFolder+DmnUserName+"/logs")
+    os.mkdir(WebFolder+DmnUserName+"/logs",0o755)
+    print("\nCreate folder:"+WebFolder+DmnUserName+"/data")
+    os.mkdir(WebFolder+DmnUserName+"/data",0o755)
+
+def CreateUser():
+    print("\nRun command: useradd -p "+UserPassword+" "+DmnUserName+" -d "+WebFolder+DmnUserName)
+    os.system("useradd -p "+UserPassword+" "+DmnUserName+" -d "+WebFolder+DmnUserName)
+    print("\nRun command: chown -R "+DmnUserName+":"+DmnUserName+ " "+WebFolder+DmnUserName)
+    os.system("chown -R "+DmnUserName+":"+DmnUserName+ " "+WebFolder+DmnUserName)
+    print("\nRun command: chmod -R 755 "+WebFolder+DmnUserName)
+    os.system("chmod -R 755 "+WebFolder+DmnUserName)
+
 def CreateNginxSite():
     wwwsub=''
     if IncludeWWW:
@@ -168,7 +176,7 @@ def CreateNginxSite():
         'gzip_buffers 16 8k;\n'\
         'gzip_disable “MSIE [1-6].(?!.*SV1)”;\n'\
         '\n'\
-        'access_log '+WebFolder+DomainName+'/logs/access.log;\n'\
+        'access_log '+WebFolder+DmnUserName+'/logs/access.log;\n'\
         'location / {\n'\
             'proxy_pass '+CoreUrl+';\n'\
             'proxy_http_version 1.1;\n'\
@@ -182,40 +190,39 @@ def CreateNginxSite():
         'ssl_certificate /etc/ssl/certs/testCert.crt;\n'\
         'ssl_certificate_key /etc/ssl/certs/testCert.key;\n'\
     '}\n'
-    print("\nCreatefile: "+NginxSaFolder+DomainName)
-    f=open(NginxSaFolder+DomainName,"w+")
+    print("\nCreatefile: "+NginxSaFolder+DmnUserName)
+    f=open(NginxSaFolder+DmnUserName,"w+")
     f.write(SiteStr)
     f.close()
-    print("\nCreate Link: ln -s "+NginxSaFolder+DomainName +" "+NginxSeFolder+DomainName)
-    os.system("ln -s "+NginxSaFolder+DomainName +" "+NginxSeFolder+DomainName)
+    print("\nCreate Link: ln -s "+NginxSaFolder+DmnUserName +" "+NginxSeFolder+DmnUserName)
+    os.system("ln -s "+NginxSaFolder+DmnUserName +" "+NginxSeFolder+DmnUserName)
 
 def CreateKestrel():
-    servicename=DomainName.replace(".","")
     KestrelStr='[Unit]\n'\
         'Description='+DomainName+' .netCore App\n'\
         '[Service]\n'\
-        'WorkingDirectory='+WebFolder+DomainName+'/html\n'\
-        'ExecStart='+DotNetBin+' '+WebFolder+DomainName+'/'+DllName+'\n'\
+        'WorkingDirectory='+WebFolder+DmnUserName+'/html\n'\
+        'ExecStart='+DotNetBin+' '+WebFolder+DmnUserName+'/'+DllName+'\n'\
         'Restart=always\n'\
         'RestartSec=10\n'\
         'KillSignal=SIGINT\n'\
         'SyslogIdentifier='+DllName+'\n'\
-        'User='+DomainName+'\n'\
+        'User='+DmnUserName+'\n'\
         'Environment=ASPNETCORE_ENVIRONMENT=Production\n'\
         'Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false\n'\
         '\n'\
         '[Install]\n'\
         'WantedBy=multi-user.target\n'
-    print("\nCreate Kestrel: /etc/systemd/system/kestrel-"+servicename+".service")
-    f=open("/etc/systemd/system/kestrel-"+servicename+".service","w+")
+    print("\nCreate Kestrel: /etc/systemd/system/kestrel-"+DmnUserName+".service")
+    f=open("/etc/systemd/system/kestrel-"+DmnUserName+".service","w+")
     f.write(KestrelStr)
     f.close()
-    print("\nEnable Service: systemctl enable kestrel-"+servicename+".service")
-    os.system("systemctl enable kestrel-"+servicename+".service")
+    print("\nEnable Service: systemctl enable kestrel-"+DmnUserName+".service")
+    os.system("systemctl enable kestrel-"+DmnUserName+".service")
 
 def CreateFtpUser():
-    print("\n Append Ftp User: echo '"+DomainName+"' >> "+VsFtpUserListFolder)
-    os.system("echo '"+DomainName+"' >> "+VsFtpUserListFolder)
+    print("\n Append Ftp User: echo '"+DmnUserName+"' >> "+VsFtpUserListFolder)
+    os.system("echo '"+DmnUserName+"' >> "+VsFtpUserListFolder)
 
 def CreateLetsEncryptCert():
     answer = input("Create LetsEncrypt Certificate ? [y/n]:")
