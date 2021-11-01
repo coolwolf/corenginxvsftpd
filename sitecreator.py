@@ -168,7 +168,7 @@ def CreateNginxSite():
         'gzip_buffers 16 8k;\n'\
         'gzip_disable “MSIE [1-6].(?!.*SV1)”;\n'\
         '\n'\
-        'access_log '+NginxLogFolder+DomainName+'.access.log;\n'\
+        'access_log '+WebFolder+DomainName+'/logs/access.log;\n'\
         'location / {\n'\
             'proxy_pass '+CoreUrl+';\n'\
             'proxy_http_version 1.1;\n'\
