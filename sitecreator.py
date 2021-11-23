@@ -156,12 +156,12 @@ def CreateNginxSite():
         wwwsub=' www.'+DomainName
     SiteStr='server {\n'\
         'listen 80;\n'\
-        'server_name '+DomainName+wwwsub+';\n'\
+        'server_name '+wwwsub+DomainName+';\n'\
         'return 301 https://$server_name$request_uri;\n'\
     '}\n'\
     'server {\n'\
         'listen 443 ssl;\n'\
-        'server_name '+DomainName+wwwsub+';\n'\
+        'server_name '+wwwsub+DomainName+';\n'\
         'ssl_session_cache  builtin:1000  shared:SSL:10m;\n'\
         'ssl_protocols  TLSv1 TLSv1.1 TLSv1.2;\n'\
         'ssl_ciphers HIGH:!aNULL:!eNULL:!EXPORT:!CAMELLIA:!DES:!MD5:!PSK:!RC4;\n'\
