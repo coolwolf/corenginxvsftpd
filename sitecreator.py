@@ -190,12 +190,12 @@ def CreateNginxSite():
         'ssl_certificate /etc/ssl/certs/testCert.crt;\n'\
         'ssl_certificate_key /etc/ssl/certs/testCert.key;\n'\
     '}\n'
-    print("\nCreatefile: "+NginxSaFolder+DmnUserName)
-    f=open(NginxSaFolder+DmnUserName,"w+")
+    print("\nCreatefile: "+NginxSaFolder+DomainName)
+    f=open(NginxSaFolder+DomainName,"w+")
     f.write(SiteStr)
     f.close()
-    print("\nCreate Link: ln -s "+NginxSaFolder+DmnUserName +" "+NginxSeFolder+DmnUserName)
-    os.system("ln -s "+NginxSaFolder+DmnUserName +" "+NginxSeFolder+DmnUserName)
+    print("\nCreate Link: ln -s "+NginxSaFolder+DomainName +" "+NginxSeFolder+DomainName)
+    os.system("ln -s "+NginxSaFolder+DomainName +" "+NginxSeFolder+DomainName)
 
 def CreateKestrel():
     KestrelStr='[Unit]\n'\
