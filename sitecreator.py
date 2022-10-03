@@ -77,6 +77,7 @@ def GetDomainName():
             print("\nEntered domain name is not valid.")
             continue
         isValid=True
+    return isValid
 
 def WwwIncluded():
     global IncludeWWW
@@ -90,6 +91,7 @@ def AskUserName():
     answer = input("User Name for domain ? ["+DmnUserName+"]:")
     if answer!="":
         DmnUserName=answer
+        print("\nUser Name will be "+DmnUserName)
 
 def AskPassword():
     isValid=False
@@ -143,8 +145,8 @@ def CreateFolders():
     os.mkdir(WebFolder+DmnUserName+"/data",0o755)
 
 def CreateUser():
-    print("\nRun command: useradd -p "+UserPassword+" "+DmnUserName+" -d "+WebFolder+DmnUserName)
-    os.system("useradd -p "+UserPassword+" "+DmnUserName+" -d "+WebFolder+DmnUserName)
+    print("\nRun command: useradd -p '"+UserPassword+"' '"+DmnUserName+"' -d "+WebFolder+DmnUserName)
+    os.system("useradd -p '"+UserPassword+"' '"+DmnUserName+"' -d "+WebFolder+DmnUserName)
     print("\nRun command: chown -R "+DmnUserName+":"+DmnUserName+ " "+WebFolder+DmnUserName)
     os.system("chown -R "+DmnUserName+":"+DmnUserName+ " "+WebFolder+DmnUserName)
     print("\nRun command: chmod -R 755 "+WebFolder+DmnUserName)
@@ -233,8 +235,12 @@ def CreateLetsEncryptCert():
         print("\nCreate Letsencrypt Certificate: certbot --nginx -d "+DomainName+wwwsub)
         os.system("certbot --nginx -d "+DomainName+wwwsub)
 
-GetDomainName()
+dmnResult=GetDomainName()
+if dmnResult==False:
+    print("entered domain is not valid.")
+    exit()
 WwwIncluded()
+AskUserName()
 AskPassword()
 AskCoreUrl()
 AskDllName()
